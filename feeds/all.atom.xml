@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>無理想，同條鹹魚有乜分別</title><link href="http://ruanweizhang.com/" rel="alternate"></link><link href="http://ruanweizhang.com/feeds/all.atom.xml" rel="self"></link><id>http://ruanweizhang.com/</id><updated>2014-10-05T00:00:00+08:00</updated><entry><title>为什么有这个博客</title><link href="http://ruanweizhang.com/pages/2014/10/05/wei-shi-yao-you-zhe-ge-bo-ke.html" rel="alternate"></link><updated>2014-10-05T00:00:00+08:00</updated><author><name>ruanweizhang</name></author><id>tag:ruanweizhang.com,2014-10-05:pages/2014/10/05/wei-shi-yao-you-zhe-ge-bo-ke.html</id><summary type="html">&lt;p&gt;Tags： blog, pelican, github&lt;br /&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>無理想，同條鹹魚有乜分別</title><link href="http://ruanweizhang.github.io/" rel="alternate"></link><link href="http://ruanweizhang.github.io/feeds/all.atom.xml" rel="self"></link><id>http://ruanweizhang.github.io/</id><updated>2014-10-05T00:00:00+08:00</updated><entry><title>为什么有这个博客</title><link href="http://ruanweizhang.github.io/pages/2014/10/05/wei-shi-yao-you-zhe-ge-bo-ke.html" rel="alternate"></link><updated>2014-10-05T00:00:00+08:00</updated><author><name>ruanweizhang</name></author><id>tag:ruanweizhang.github.io,2014-10-05:pages/2014/10/05/wei-shi-yao-you-zhe-ge-bo-ke.html</id><summary type="html">&lt;p&gt;Tags： blog, pelican, github&lt;br /&gt;
 Slug: reason_to_build_blog  &lt;/p&gt;
 &lt;hr /&gt;
 &lt;h2&gt;为什么要有自己的blog&lt;/h2&gt;
@@ -22,5 +22,4 @@ Slug: reason_to_build_blog  &lt;/p&gt;
 &lt;li&gt;github相当于服务器，只需要把pelican生成的静态网页push到github就可以了。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr /&gt;
-&lt;p&gt;最后奉上我的BGM，献给所有为自己理想奋斗的人。  &lt;/p&gt;
-&lt;iframe title="追梦赤子心" width="640" height="360" src="//www.youtube.com/embed/N49C1hP_r3s" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;</summary></entry></feed>
+&lt;p&gt;最后奉上我的BGM，献给所有为自己理�&lt;iframe title="追梦赤子心" width="640" height="360" src="//www.youtube.com/embed/N49C1hP_r3s" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;</summary></entry></feed>e&gt;</summary></entry></feed>
