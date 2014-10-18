@@ -4,56 +4,56 @@ xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitem
 xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
-<loc>http://ruanweizhang.com/index.html</loc>
-<lastmod>2014-10-18T11:13:21-00:00</lastmod>
+<loc>http://ruanweizhang.github.io/index.html</loc>
+<lastmod>2014-10-18T11:17:40-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>http://ruanweizhang.com/archives.html</loc>
-<lastmod>2014-10-18T11:13:21-00:00</lastmod>
+<loc>http://ruanweizhang.github.io/archives.html</loc>
+<lastmod>2014-10-18T11:17:40-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>http://ruanweizhang.com/tags.html</loc>
-<lastmod>2014-10-18T11:13:21-00:00</lastmod>
+<loc>http://ruanweizhang.github.io/tags.html</loc>
+<lastmod>2014-10-18T11:17:40-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>http://ruanweizhang.com/categories.html</loc>
-<lastmod>2014-10-18T11:13:21-00:00</lastmod>
+<loc>http://ruanweizhang.github.io/categories.html</loc>
+<lastmod>2014-10-18T11:17:40-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>http://ruanweizhang.com/pages/about.html</loc>
-<lastmod>2014-10-18T11:13:21-00:00</lastmod>
+<loc>http://ruanweizhang.github.io/pages/about.html</loc>
+<lastmod>2014-10-18T11:17:40-00:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.3</priority>
 </url>
 
 <url>
-<loc>http://ruanweizhang.com/pages/2014/10/05/wei-shi-yao-you-zhe-ge-bo-ke.html</loc>
+<loc>http://ruanweizhang.github.io/pages/2014/10/05/wei-shi-yao-you-zhe-ge-bo-ke.html</loc>
 <lastmod>2014-10-05T00:00:00-00:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.7</priority>
 </url>
 
 <url>
-<loc>http://ruanweizhang.com/category/misc.html</loc>
+<loc>http://ruanweizhang.github.io/category/misc.html</loc>
 <lastmod>2014-10-05T00:00:00+08:06</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>http://ruanweizhang.com/author/ruanweizhang.html</loc>
+<loc>http://ruanweizhang.github.io/author/ruanweizhang.html</loc>
 <lastmod>2014-10-05T00:00:00+08:06</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
