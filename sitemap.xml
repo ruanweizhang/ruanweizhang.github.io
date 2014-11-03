@@ -5,48 +5,69 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://ruanweizhang.github.io/index.html</loc>
-<lastmod>2014-11-03T21:18:53-00:00</lastmod>
+<lastmod>2014-11-03T21:33:33-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://ruanweizhang.github.io/archives.html</loc>
-<lastmod>2014-11-03T21:18:53-00:00</lastmod>
+<lastmod>2014-11-03T21:33:33-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://ruanweizhang.github.io/tags.html</loc>
-<lastmod>2014-11-03T21:18:53-00:00</lastmod>
+<lastmod>2014-11-03T21:33:33-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://ruanweizhang.github.io/categories.html</loc>
-<lastmod>2014-11-03T21:18:53-00:00</lastmod>
+<lastmod>2014-11-03T21:33:33-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://ruanweizhang.github.io/pages/about.html</loc>
-<lastmod>2014-11-03T21:18:53-00:00</lastmod>
+<lastmod>2014-11-03T21:33:33-00:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.3</priority>
 </url>
 
 <url>
-<loc>http://ruanweizhang.github.io/pages/2014/10/05/wei-shi-yao-you-zhe-ge-bo-ke.html</loc>
+<loc>http://ruanweizhang.github.io/pages/2014/10/05/reason_to_build_blog.html</loc>
 <lastmod>2014-10-05T00:00:00-00:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.7</priority>
 </url>
 
 <url>
-<loc>http://ruanweizhang.github.io/category/misc.html</loc>
+<loc>http://ruanweizhang.github.io/category/thoughts.html</loc>
+<lastmod>2014-10-05T00:00:00+08:06</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://ruanweizhang.github.io/tag/blog.html</loc>
+<lastmod>2014-10-05T00:00:00+08:06</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://ruanweizhang.github.io/tag/pelican.html</loc>
+<lastmod>2014-10-05T00:00:00+08:06</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://ruanweizhang.github.io/tag/github.html</loc>
 <lastmod>2014-10-05T00:00:00+08:06</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
