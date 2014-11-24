@@ -5,37 +5,44 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://ruanweizhang.github.io/index.html</loc>
-<lastmod>2014-11-24T17:38:14-00:00</lastmod>
+<lastmod>2014-11-24T21:20:48-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://ruanweizhang.github.io/archives.html</loc>
-<lastmod>2014-11-24T17:38:14-00:00</lastmod>
+<lastmod>2014-11-24T21:20:48-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://ruanweizhang.github.io/tags.html</loc>
-<lastmod>2014-11-24T17:38:14-00:00</lastmod>
+<lastmod>2014-11-24T21:20:48-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://ruanweizhang.github.io/categories.html</loc>
-<lastmod>2014-11-24T17:38:14-00:00</lastmod>
+<lastmod>2014-11-24T21:20:48-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://ruanweizhang.github.io/pages/about.html</loc>
-<lastmod>2014-11-24T17:38:14-00:00</lastmod>
+<lastmod>2014-11-24T21:20:48-00:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.3</priority>
+</url>
+
+<url>
+<loc>http://ruanweizhang.github.io/pages/2014/11/24/always_with_me.html</loc>
+<lastmod>2014-11-24T00:00:00-00:00</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
 </url>
 
 <url>
@@ -46,6 +53,13 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
+<loc>http://ruanweizhang.github.io/category/music.html</loc>
+<lastmod>2014-11-24T00:00:00+08:06</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
 <loc>http://ruanweizhang.github.io/category/thoughts.html</loc>
 <lastmod>2014-10-05T00:00:00+08:06</lastmod>
 <changefreq>daily</changefreq>
@@ -53,14 +67,14 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
-<loc>http://ruanweizhang.github.io/tag/blog.html</loc>
-<lastmod>2014-10-05T00:00:00+08:06</lastmod>
+<loc>http://ruanweizhang.github.io/tag/guitar.html</loc>
+<lastmod>2014-11-24T00:00:00+08:06</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>http://ruanweizhang.github.io/tag/pelican.html</loc>
+<loc>http://ruanweizhang.github.io/tag/blog.html</loc>
 <lastmod>2014-10-05T00:00:00+08:06</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
@@ -74,8 +88,22 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
-<loc>http://ruanweizhang.github.io/author/ruanweizhang.html</loc>
+<loc>http://ruanweizhang.github.io/tag/pelican.html</loc>
 <lastmod>2014-10-05T00:00:00+08:06</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://ruanweizhang.github.io/tag/finger-style.html</loc>
+<lastmod>2014-11-24T00:00:00+08:06</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://ruanweizhang.github.io/author/ruanweizhang.html</loc>
+<lastmod>2014-11-24T00:00:00+08:06</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
