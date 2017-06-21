@@ -5,7 +5,7 @@ welcome_message: <a href="https://github.com/onevcat/vno-jekyll" target="_blank"
 description: Vno Jekyll is a port of my Ghost theme vno.
 creator: <a href="http://onev.cat">@onevcat</a>
 
-url: "http://ruanweizhang.cn"
+url: "ruanweizhang.cn"
 
 permalink: /:year/:month/:title/
 
@@ -32,7 +32,7 @@ paginate_path: "page/:num/"
 
 # Comment
 comment:
-    disqus: Eric_Ruan
+    disqus: ruanweizhanggithubio
     # duoshuo: 
     
 # Social
@@ -47,6 +47,3 @@ social:
 ga:
     # id: your_ga_id
     # host: your_host
-#comment
-    comment:
-        disqus:Eric_Ruan
