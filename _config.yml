@@ -45,5 +45,5 @@ social:
 
 # Google Analytics
 ga:
-    # id: your_ga_id
-    # host: your_host
+    id: UA-55434310-1
+    host: ruanweizhang.cn
