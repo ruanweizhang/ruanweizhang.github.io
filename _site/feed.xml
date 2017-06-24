@@ -5,8 +5,8 @@
     <description></description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 24 Jun 2017 21:45:52 +0800</pubDate>
-    <lastBuildDate>Sat, 24 Jun 2017 21:45:52 +0800</lastBuildDate>
+    <pubDate>Sat, 24 Jun 2017 22:09:39 +0800</pubDate>
+    <lastBuildDate>Sat, 24 Jun 2017 22:09:39 +0800</lastBuildDate>
     <generator>Jekyll v3.4.0</generator>
     
       <item>
@@ -93,7 +93,7 @@ repositories.
 
 &lt;h4 id=&quot;test-the-hello-world-rpc-via-rest&quot;&gt;Test the ‘hello-world’ RPC via REST&lt;/h4&gt;
 
-&lt;p&gt;&lt;img src=&quot;OpenDaylight-startup.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/images/2017/OpenDaylight-startup.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 </description>
         <pubDate>Fri, 23 Jun 2017 19:10:00 +0800</pubDate>
         <link>http://localhost:4000/2017/06/OpenDaylight-get-started/</link>

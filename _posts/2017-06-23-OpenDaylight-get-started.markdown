@@ -39,12 +39,7 @@ Failed to execute goal org.apache.maven.plugins:maven-archetype-plugin:3.0.1:gen
 The reason is explained [here](http://maven.apache.org/archetype/maven-archetype-plugin/archetype-repository.html)
 
 ```
-As of Maven Archetype Plugin 3.0.0 the archetype resolution has  
-changed. It is not possible anymore to specify the repository   
-via the commandline, but instead the repositories as already  
-specified for Maven are used. This means that also the mirrors  
-and proxies are respected, as well as the authentication on  
-repositories.
+As of Maven Archetype Plugin 3.0.0 the archetype resolution has changed. It is not possible anymore to specify the repository via the commandline, but instead the repositories as already specified for Maven are used. This means that also the mirrors and proxies are respected, as well as the authentication on repositories.
 ```
 
 solution is to lock the version of the plugin to `2.4`, run this command
