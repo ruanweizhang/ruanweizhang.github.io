@@ -1,9 +1,9 @@
 # Basic
-title: Vno Jekyll
-subtitle: A blog-orientation theme for Jekyll
-welcome_message: <a href="https://github.com/onevcat/vno-jekyll" target="_blank">Download the theme</a>
-description: Vno Jekyll is a port of my Ghost theme vno.
-creator: <a href="http://onev.cat">@onevcat</a>
+title: Ruan Weizhang
+subtitle: Welcome to my blog
+#welcome_message: <a href="https://github.com/onevcat/vno-jekyll" target="_blank">Download the theme</a>
+#description: Vno Jekyll is a port of my Ghost theme vno.
+creator: <a href="http://ruanweizhang.cn">@eric</a>
 
 url: http://ruanweizhang.cn
 
@@ -37,10 +37,8 @@ comment:
     
 # Social
 social:
-    weibo: onevcat
+    facebook: ruanweizhang
     github: ruanweizhang
-    twitter: none
-    gplus: 
     mail: ruanweizhang@gmail.com
 
 # Google Analytics
