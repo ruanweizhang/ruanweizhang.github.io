@@ -1,7 +1,7 @@
 ---
 layout: post
 title: OpenDaylight startup
-date: 2017-06-023 19:10:00.000000000 +08:00
+date: 2017-06-23 19:10:00 +08:00
 tags: OpenDaylight, startup
 ---
 
