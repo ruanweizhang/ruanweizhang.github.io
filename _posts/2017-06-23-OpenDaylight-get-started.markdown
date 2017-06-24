@@ -78,6 +78,6 @@ you can try with this:
 mvn clean install -Dcheckstyle.skip
 ```
 
-#### Test the 'hello-world' RPC via REST
+#### Test the `hello-world` RPC via REST
 
 ![](/assets/images/2017/OpenDaylight-startup.png)
