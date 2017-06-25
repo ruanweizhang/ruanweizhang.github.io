@@ -5,7 +5,6 @@ date: 2017-06-23 19:10:00 +08:00
 tags: OpenDaylight, startup
 ---
 
-# OpenDaylight Startup
 
 This article is based on official tutorial [Startup Project Archetype](https://wiki.opendaylight.org/view/OpenDaylight_Controller:MD-SAL:Startup_Project_Archetype). Since the official tutorial is out-of-date, I encounter some errors and this article is about how I solve them. Thanks for [Yochang](https://www.facebook.com/profile.php?id=100000181252042&fref=ts) and [Sesame](https://www.facebook.com/sesame.chen?fref=ts)'s contributions.
 
