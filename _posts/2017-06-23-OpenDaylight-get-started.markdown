@@ -108,7 +108,7 @@ module hello {
 vim ~/hello/impl/src/main/java/org/opendaylight/hello/impl/HelloWorldImpl.java
 ```
 
-```
+```java
 package org.opendaylight.hello.impl;
 
 import java.util.concurrent.Future;
@@ -138,7 +138,7 @@ vim hello/impl/src/main/resources/org/opendaylight/blueprint/impl-blueprint.xml
 
 ```
 
-```
+```xml
  <?xml version="1.0" encoding="UTF-8"?>
  <!-- vi: set et smarttab sw=4 tabstop=4: -->
  <!--
@@ -174,7 +174,7 @@ vim hello/impl/src/main/resources/org/opendaylight/blueprint/impl-blueprint.xml
 vim hello/imp/src/main/java/org/opendaylight/hello/impl/HelloProvider.java
 ```
 
-```
+```java
 /*
  * Copyright © 2016 Cisco Systems and others.  All rights reserved.
  *
