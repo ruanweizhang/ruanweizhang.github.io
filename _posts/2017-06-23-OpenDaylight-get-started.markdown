@@ -62,7 +62,7 @@ mvn clean install
 ```
 ./karaf/target/assembly/bin/karaf
 ```
-看到下面的显示久成功了
+看到下面的显示就说明成功了
 
 ```
 opendaylight-user@root>
