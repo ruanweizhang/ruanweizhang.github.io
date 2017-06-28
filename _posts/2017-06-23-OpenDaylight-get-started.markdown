@@ -238,7 +238,7 @@ mvn clean install
 mvn clean install -Dcheckstyle.skip
 ```
 
-#### Test the `hello-world` RPC via REST
+### Test the `hello-world` RPC via REST
 最后登录`localhost:8181/apidoc/explorer/index.html`
 点击`hello(2015-01-05)` 和 `POST /operations/hello:hello-world`, 输入`{"hello:input": { "name":"Your Name"}}`,点击`Try it out`就能得到下面的结果了
 ![](/assets/images/2017/OpenDaylight-startup.png)
