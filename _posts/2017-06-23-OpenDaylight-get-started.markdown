@@ -9,11 +9,11 @@ tags: OpenDaylight, Hello, Project
 This article is based on official tutorial [Startup Project Archetype](https://wiki.opendaylight.org/view/OpenDaylight_Controller:MD-SAL:Startup_Project_Archetype). Since the official tutorial is out-of-date, I encounter some errors and this article is about how I solve them. Thanks for [Yochang](https://www.facebook.com/profile.php?id=100000181252042&fref=ts) and [Sesame](https://www.facebook.com/sesame.chen?fref=ts)'s contributions.
 
 ### environment
-* OS: Ubuntu 16.04
-* OpenDaylight: Boron-SR3
+* OS: Ubuntu **16.04**
+* OpenDaylight: **Boron-SR3**
 
 ### part 1
-In Ubuntu 16.04, after installing maven I couldn't find `~/.m2/settings.xml`, later I find out it is in ``/usr/share/maven/conf/``, copy it to `~/.m2`
+In Ubuntu **16.04**, after installing maven I couldn't find `~/.m2/settings.xml`, later I find out it is in ``/usr/share/maven/conf/``, copy it to `~/.m2`
 
 ```bash
 cp /usr/share/maven/conf/settings.xml ~/.m2/settings.xml
@@ -41,7 +41,7 @@ The reason is explained [here](http://maven.apache.org/archetype/maven-archetype
 As of Maven Archetype Plugin 3.0.0 the archetype resolution has changed. It is not possible anymore to specify the repository via the commandline, but instead the repositories as already specified for Maven are used. This means that also the mirrors and proxies are respected, as well as the authentication on repositories.
 ```
 
-solution is to lock the version of the plugin to `2.4`, run this command
+solution is to lock the version of the plugin to **2.4**, run this command
 
 ```bash
 mvn org.apache.maven.plugins:maven-archetype-plugin:2.4:generate -DarchetypeGroupId=org.opendaylight.controller -DarchetypeArtifactId=opendaylight-startup-archetype -DarchetypeRepository=opendaylight.release/ -DarchetypeCatalog=http://nexus.opendaylight.org/content/repositories/opendaylight.snapshot/archetype-catalog.xml -DarchetypeVersion=1.2.3-Boron-SR3
@@ -239,5 +239,6 @@ mvn clean install -Dcheckstyle.skip
 ```
 
 #### Test the `hello-world` RPC via REST
-
+最后登录`localhost:8181/apidoc/explorer/index.html`
+点击`hello(2015-01-05)` 和 `POST /operations/hello:hello-world`, 输入`{"hello:input": { "name":"Your Name"}}`,点击`Try it out`就能得到下面的结果了
 ![](/assets/images/2017/OpenDaylight-startup.png)
