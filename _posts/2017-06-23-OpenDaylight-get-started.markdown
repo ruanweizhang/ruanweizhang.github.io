@@ -48,8 +48,13 @@ mvn org.apache.maven.plugins:maven-archetype-plugin:2.4:generate -DarchetypeGrou
 ```
 The tutorial is actually using `classPrefix` `Hello` instead of `hello`:
 
-```bash
-Define value for property 'classPrefix': Hello
+```
+Define value for property 'groupId': : org.opendaylight.hello
+Define value for property 'artifactId': : hello
+Define value for property 'version': 1.0-SNAPSHOT
+Define value for property 'package':  org.opendaylight.hello: : 
+Define value for property 'classPrefix':  Hello
+Define value for property 'copyright': : Yoyodyne, Inc.
 ```
 
 到这里我们只是有了一个符合maven结构的目录框架，想要运行还需要在project根目录下build `hello` project
