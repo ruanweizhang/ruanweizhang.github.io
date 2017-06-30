@@ -113,8 +113,9 @@ Quote break
  ```
  这样HelloProvider就可以construct一个instance了。
 
- ### Advertising services
- 如果想要将自己实现的interface (*也就是bean*) 作为一个service注册到MD-SAL，供其他人reference的话，这个过程就叫advertise service
+### Advertising services
+ 
+如果想要将自己实现的interface (*也就是bean*) 作为一个service注册到MD-SAL，供其他人reference的话，这个过程就叫advertise service
 
  ```xml
  <?xml version="1.0" encoding="UTF-8"?>
