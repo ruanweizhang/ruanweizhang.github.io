@@ -5,32 +5,268 @@
     <description></description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 24 Jun 2017 22:09:39 +0800</pubDate>
-    <lastBuildDate>Sat, 24 Jun 2017 22:09:39 +0800</lastBuildDate>
+    <pubDate>Fri, 30 Jun 2017 22:27:34 +0800</pubDate>
+    <lastBuildDate>Fri, 30 Jun 2017 22:27:34 +0800</lastBuildDate>
     <generator>Jekyll v3.4.0</generator>
     
       <item>
-        <title>OpenDaylight startup</title>
-        <description>&lt;h1 id=&quot;opendaylight-startup&quot;&gt;OpenDaylight Startup&lt;/h1&gt;
-
-&lt;p&gt;This article is based on official tutorial &lt;a href=&quot;https://wiki.opendaylight.org/view/OpenDaylight_Controller:MD-SAL:Startup_Project_Archetype&quot;&gt;Startup Porject Archetype&lt;/a&gt;. Since the official tutorial is out-of-date, I encounter some errors and this article is about how I solve them. Thanks for &lt;a href=&quot;https://www.facebook.com/profile.php?id=100000181252042&amp;amp;fref=ts&quot;&gt;Yochang&lt;/a&gt; and &lt;a href=&quot;https://www.facebook.com/sesame.chen?fref=ts&quot;&gt;Sesame&lt;/a&gt;’s contributions.&lt;/p&gt;
-
-&lt;h3 id=&quot;develop-environment&quot;&gt;develop environment&lt;/h3&gt;
+        <title>Blueprint in Opendaylight</title>
+        <description>&lt;h3 id=&quot;什么是blueprint&quot;&gt;什么是Blueprint&lt;/h3&gt;
+&lt;p&gt;Blueprint是Apache Aries底下的一个项目。Apache Aries project consists of a set of
+pluggable Java components enabling an enterprise OSGi application programming
+models, including:&lt;/p&gt;
 &lt;ul&gt;
-  &lt;li&gt;OS: Ubuntu 16.04&lt;/li&gt;
-  &lt;li&gt;OpenDaylight: Boron-SR3&lt;/li&gt;
+  &lt;li&gt;Asynchronous Services and Promises Specification&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Blueprint Specification&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;JTA Transaction Services Specification&lt;/li&gt;
+  &lt;li&gt;JMX Management Model Specification (ODL也有用到JMX，之后再来研究这个)&lt;/li&gt;
+  &lt;li&gt;JNDI Services Specification&lt;/li&gt;
+  &lt;li&gt;JPA Service Specification&lt;/li&gt;
+  &lt;li&gt;Service Loader Mediator Specification&lt;/li&gt;
+  &lt;li&gt;Subsystem Service Specification&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;官网上的介绍：
+Blueprint provides a dependency injection framework for OSGi and was standardized
+by the OSGi Alliance in OSGi Compendium R4.2. It is designed to deal with the dynamic
+nature of OSGi, where services can become available and unavailable at any time.
+一句话总结：Blueprint就是为了解决OSGi里面的依赖关系。&lt;/p&gt;
+
+&lt;h4 id=&quot;blueprint语法&quot;&gt;Blueprint语法&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;bean&lt;/strong&gt; - an element that describes a Java object to be instantiated given a class name and optional constructor args and properties.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;service&lt;/strong&gt; - advertises a bean as an OSGi service&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;reference&lt;/strong&gt; - imports a singleton OSGi service that implements a specified interface and/or satisfies a specified property filter&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;reference-list&lt;/strong&gt; - imports multiple OSGi services that implement a specified interface and/or satisfy a specified property filter&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;下面会有一些例子使用到这些语法&lt;/p&gt;
+&lt;h4 id=&quot;blueprint-xml&quot;&gt;Blueprint XML&lt;/h4&gt;
+&lt;p&gt;每份Blueprint的结构都必须是长这样的，xmlns是xml namespace的意思&lt;/p&gt;
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;blueprint&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.osgi.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    ...
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/blueprint&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;引入ma-salservices-databroker-rpcproviderregistry-notificationpublishservice&quot;&gt;引入MA-SALservices: DataBroker, RpcProviderRegistry, NotificationPublishService&lt;/h4&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;blueprint&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.osgi.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;
+                 &lt;span class=&quot;na&quot;&gt;xmlns:odl=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://opendaylight.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;odl:use-default-for-reference-types=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;reference&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;dataBroker&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;interface=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.controller.md.sal.binding.api.DataBroker&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;odl:type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;default&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;reference&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;rpcRegistry&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;interface=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.controller.sal.binding.api.RpcProviderRegistry&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;reference&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;notificationService&quot;&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;interface=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.controller.md.sal.binding.api.NotificationPublishService&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/blueprint&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;注意reference引入的都是interface&lt;/p&gt;
+
+&lt;h3 id=&quot;bean&quot;&gt;Bean&lt;/h3&gt;
+&lt;p&gt;Bean is an element that describes a Java object to be instantiated given a class
+ name and optional constructor args and properties. 从这句话能看出来bean其实就是引入的一个class。但是为什么一个class要特意叫做bean呢，是不是多此一举？
+ &lt;a href=&quot;https://stackoverflow.com/questions/3295496/what-is-a-javabean-exactly&quot;&gt;hvhotcodes@stackoverflow&lt;/a&gt;
+ 的回答是&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;A JavaBean is a standard including:&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;li&gt;All properties private (use getters/setters)&lt;/li&gt;
+    &lt;li&gt;A public no-argument constructor&lt;/li&gt;
+    &lt;li&gt;Implements Serializable.
+Quote break&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;符合这个standard的class会有一些优点，有兴趣的可以再看下&lt;a href=&quot;https://www.zhihu.com/question/19773379&quot;&gt;杨博@知乎&lt;/a&gt;的回答。&lt;/p&gt;
+
+&lt;p&gt;下面是在Blueprint引入bean的一个例子，从org.opendaylight.spark.impl包下引入HelloProvider class，并取名为provider.&lt;/p&gt;
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;blueprint&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.osgi.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;&amp;lt;bean&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;provider&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.spark.impl.HelloProvider&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/blueprint&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;在我上一篇文章&lt;code class=&quot;highlighter-rouge&quot;&gt;Hello Project&lt;/code&gt;里面，我的impl-blueprint.xml是长下面这样的，可以看到引入了两个interface,
+ DataBroker, RpcProviderRegistry,然后定义bean的时候将这两个作为argument参数传进去了&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;nt&quot;&gt;&amp;lt;blueprint&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.osgi.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;xmlns:odl=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://opendaylight.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;odl:use-default-for-reference-types=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;reference&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;dataBroker&quot;&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;interface=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.controller.md.sal.binding.api.DataBroker&quot;&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;odl:type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;default&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;reference&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;rpcRegistry&quot;&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;interface=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.controller.sal.binding.api.RpcProviderRegistry&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;bean&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;provider&quot;&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.spark.impl.HelloProvider&quot;&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;init-method=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;init&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;destroy-method=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;close&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;argument&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ref=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;dataBroker&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;argument&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ref=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;rpcRegistry&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+ &lt;span class=&quot;nt&quot;&gt;&amp;lt;/bean&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/blueprint&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;参数传进去之后，对应的HelloProvider的constructor代码是：&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;HelloProvider&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DataBroker&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dataBroker&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RpcProviderRegistry&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rpcProviderRegistry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;dataBroker&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dataBroker&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;rpcProviderRegistry&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rpcProviderRegistry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;这样HelloProvider就可以construct一个instance了。&lt;/p&gt;
+
+&lt;h3 id=&quot;advertising-services&quot;&gt;Advertising services&lt;/h3&gt;
+
+&lt;p&gt;如果想要将自己实现的interface (&lt;em&gt;也就是bean&lt;/em&gt;) 作为一个service注册到MD-SAL，供其他人reference的话，这个过程就叫advertise service&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;blueprint&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.osgi.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;
+                 &lt;span class=&quot;na&quot;&gt;xmlns:odl=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://opendaylight.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;bean&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;helloSerivceImpl&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.app.HelloSerivceImpl&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- constructor args --&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/bean&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;service&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ref=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;helloSerivceImpl&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;interface=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.app.HelloSerivce&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;odl:type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;default&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/blueprint&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;上面实现的是将HelloSerivceImpl所实现的HelloSerivce interface advertise出去。在ODL命名规则里面，XXXImpl通常是XXX的实现，这样XXXImpl通常就是实现的方法，而XXX通常就是interface的定义. 前面提到，service是将一个bean advertise出去，这样其他人就可以像上面一样利用reference引用了&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;nt&quot;&gt;&amp;lt;reference&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;helloSerivceImpl&quot;&lt;/span&gt;
+   &lt;span class=&quot;na&quot;&gt;interface=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.app.HelloSerivce&quot;&lt;/span&gt;
+   &lt;span class=&quot;na&quot;&gt;odl:type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;default&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;### MD-SAL Bluerint extensions
+Opendaylight provides 2 blueprint extensions to make it easier to register and consume global MD-SAL RPC services.。 RPC service有三种：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Global service: There is only one instance of a Global Service per controller instance (Note that a controller instance can consist of a cluster of controller nodes).&lt;/li&gt;
+  &lt;li&gt;Routed service: There can be multiple instances (implementations) of a service per controller instance&lt;/li&gt;
+  &lt;li&gt;Mounted service: Mounted service is a special type of services, which could be nested at well-known points in the overall data tree.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;blueprint专门为RPC提供的两种extension分别是global service和routed service&lt;/p&gt;
+&lt;h4 id=&quot;global-rpcs&quot;&gt;Global RPCs&lt;/h4&gt;
+&lt;p&gt;use &lt;code class=&quot;highlighter-rouge&quot;&gt;rpc-implements&lt;/code&gt; element in provider to register a service implementation&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;blueprint&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.osgi.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;
+                 &lt;span class=&quot;na&quot;&gt;xmlns:odl=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://opendaylight.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;bean&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;fooRpcService&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.app.FooRpcServiceImpl&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- constructor args --&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/bean&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;odl:rpc-implementation&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ref=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;fooRpcService&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/blueprint&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;use &lt;code class=&quot;highlighter-rouge&quot;&gt;odl:rpc-service&lt;/code&gt; in consumer to use the service implementation&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;blueprint&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.osgi.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;
+                 &lt;span class=&quot;na&quot;&gt;xmlns:odl=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://opendaylight.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;odl:rpc-service&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;fooRpcService&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;interface=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.app.FooRpcService&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;bean&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;bar&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.app.Bar&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;argument&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ref=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;fooRpcService&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/bean&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/blueprint&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;这种做法跟上面的advertising services有什么实质上的区别，目前还不看出来。先留个坑，以后弄清楚了再来补。&lt;/p&gt;
+
+&lt;h4 id=&quot;routed-rpcs&quot;&gt;Routed RPCs&lt;/h4&gt;
+&lt;p&gt;use &lt;code class=&quot;highlighter-rouge&quot;&gt;odl:routed-rpc-implementation&lt;/code&gt; element&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;blueprint&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.osgi.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;
+                 &lt;span class=&quot;na&quot;&gt;xmlns:odl=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://opendaylight.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;bean&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;fooRoutedRpcService&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.app.FooRoutedRpcServiceImpl&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- constructor args --&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/bean&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;odl:routed-rpc-implementation&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;fooRoutedRpcServiceReg&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ref=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;fooRoutedRpcService&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;bean&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;bar&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.app.Bar&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;argument&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ref=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;fooRoutedRpcServiceReg&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/bean&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/blueprint&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;notificationlistener&quot;&gt;NotificationListener&lt;/h4&gt;
+&lt;p&gt;ODL还有对notification的extension。notification是ODL messaging pattern之一，不属于rpc。下面的做法是先实作出FooNotificationListener，并且作为bean引入到blueprint，再使用&lt;code class=&quot;highlighter-rouge&quot;&gt;odl:notification-listener&lt;/code&gt; element注册到MD-SAL NotificationService，从而接收yang notifications.&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;blueprint&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.osgi.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;
+                 &lt;span class=&quot;na&quot;&gt;xmlns:odl=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://opendaylight.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;bean&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;fooListener&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.app.FooNotificationListener&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- constructor args --&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/bean&amp;gt;&lt;/span&gt;
+
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;odl:notification-listener&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ref=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;fooListener&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/blueprint&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;application-configuration&quot;&gt;Application Configuration&lt;/h4&gt;
+
+&lt;p&gt;ODL还提供一种extension叫&lt;code class=&quot;highlighter-rouge&quot;&gt;odl:clustered-app-config&lt;/code&gt;的element，主要是为了能够configure一些applicaiton-defined configuration yang data. yang文件里面定义的data分两种，&lt;code class=&quot;highlighter-rouge&quot;&gt;config false&lt;/code&gt;的是operational data，&lt;code class=&quot;highlighter-rouge&quot;&gt;config true&lt;/code&gt;的是configurational data。这个extension就是为了能够从data store里面获得并改变configuration data。有兴趣的可以去看下&lt;a href=&quot;https://wiki.opendaylight.org/view/OpenDaylight_Controller:MD-SAL:Toaster_Step-By-Step&quot;&gt;Toaster Tutorial Step by Step&lt;/a&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;part 7：Part 7: Adding configuration for the Toaster provider application&lt;/code&gt;, 不过因为过时了里面很多错请做好心理准备==!&lt;/p&gt;
+</description>
+        <pubDate>Fri, 30 Jun 2017 21:40:00 +0800</pubDate>
+        <link>http://localhost:4000/2017/06/Blueprint-in-OpenDaylight/</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/06/Blueprint-in-OpenDaylight/</guid>
+        
+        <category>OpenDaylight,</category>
+        
+        <category>Blueprint</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>OpenDaylight Hello Project</title>
+        <description>&lt;p&gt;This article is based on official tutorial &lt;a href=&quot;https://wiki.opendaylight.org/view/OpenDaylight_Controller:MD-SAL:Startup_Project_Archetype&quot;&gt;Startup Project Archetype&lt;/a&gt;. Since the official tutorial is out-of-date, I encounter some errors and this article is about how I solve them. Thanks for &lt;a href=&quot;https://www.facebook.com/profile.php?id=100000181252042&amp;amp;fref=ts&quot;&gt;Yochang&lt;/a&gt; and &lt;a href=&quot;https://www.facebook.com/sesame.chen?fref=ts&quot;&gt;Sesame&lt;/a&gt;’s contributions.&lt;/p&gt;
+
+&lt;h3 id=&quot;environment&quot;&gt;environment&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;OS: Ubuntu &lt;strong&gt;16.04&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;OpenDaylight: &lt;strong&gt;Boron-SR3&lt;/strong&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h3 id=&quot;part-1&quot;&gt;part 1&lt;/h3&gt;
-&lt;p&gt;In Ubuntu 16.04, after installing maven I couldn’t find &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.m2/settings.xml&lt;/code&gt;, later I find out it is in &lt;code class=&quot;highlighter-rouge&quot;&gt;/usr/share/maven/conf/&lt;/code&gt;, copy it to &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.m2&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;In Ubuntu &lt;strong&gt;16.04&lt;/strong&gt;, after installing maven I couldn’t find &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.m2/settings.xml&lt;/code&gt;, later I find out it is in &lt;code class=&quot;highlighter-rouge&quot;&gt;/usr/share/maven/conf/&lt;/code&gt;, copy it to &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.m2&lt;/code&gt;&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cp /usr/share/maven/conf/settings.xml ~/.m2/settings.xml
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cp /usr/share/maven/conf/settings.xml ~/.m2/settings.xml
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
 &lt;p&gt;In building &lt;code class=&quot;highlighter-rouge&quot;&gt;example&lt;/code&gt; project, I choose &lt;code class=&quot;highlighter-rouge&quot;&gt;Boron-SR3&lt;/code&gt;&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn archetype:generate -DarchetypeGroupId=org.opendaylight.controller -DarchetypeArtifactId=opendaylight-startup-archetype -DarchetypeVersion=1.2.3-Boron-SR3 -DarchetypeRepository=https://nexus.opendaylight.org/content/repositories/public/ -DarchetypeCatalog=remote
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn archetype:generate -DarchetypeGroupId&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;org.opendaylight.controller -DarchetypeArtifactId&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;opendaylight-startup-archetype -DarchetypeVersion&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1.2.3-Boron-SR3 -DarchetypeRepository&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://nexus.opendaylight.org/content/repositories/public/ -DarchetypeCatalog&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;remote
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
@@ -40,157 +276,227 @@
 
 &lt;p&gt;In building &lt;code class=&quot;highlighter-rouge&quot;&gt;hello&lt;/code&gt; project, I encounter this error&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Failed to execute goal org.apache.maven.plugins:maven-archetype-plugin:3.0.1:generate (default-cli) on project standalone-pom: archetypeCatalog http://nexus.opendaylight.org/content/repositories/opendaylight.snapshot/archetype-catalog.xml' is not supported anymore. Please read the plugin documentation for details. -&amp;gt; [Help 1]
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Failed to execute goal org.apache.maven.plugins:maven-archetype-plugin:3.0.1:generate &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;default-cli&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; on project standalone-pom: archetypeCatalog http://nexus.opendaylight.org/content/repositories/opendaylight.snapshot/archetype-catalog.xml&lt;span class=&quot;s1&quot;&gt;' is not supported anymore. Please read the plugin documentation for details. -&amp;gt; [Help 1]
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
 &lt;p&gt;The reason is explained &lt;a href=&quot;http://maven.apache.org/archetype/maven-archetype-plugin/archetype-repository.html&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;As of Maven Archetype Plugin 3.0.0 the archetype resolution has  
-changed. It is not possible anymore to specify the repository   
-via the commandline, but instead the repositories as already  
-specified for Maven are used. This means that also the mirrors  
-and proxies are respected, as well as the authentication on  
-repositories.
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;As of Maven Archetype Plugin 3.0.0 the archetype resolution has changed. It is not possible anymore to specify the repository via the commandline, but instead the repositories as already specified &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;Maven are used. This means that also the mirrors and proxies are respected, as well as the authentication on repositories.
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;solution is to lock the version of the plugin to &lt;code class=&quot;highlighter-rouge&quot;&gt;2.4&lt;/code&gt;, run this command&lt;/p&gt;
+&lt;p&gt;solution is to lock the version of the plugin to &lt;strong&gt;2.4&lt;/strong&gt;, run this command&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn org.apache.maven.plugins:maven-archetype-plugin:2.4:generate -DarchetypeGroupId=org.opendaylight.controller -DarchetypeArtifactId=opendaylight-startup-archetype -DarchetypeRepository=opendaylight.release/ -DarchetypeCatalog=http://nexus.opendaylight.org/content/repositories/opendaylight.snapshot/archetype-catalog.xml -DarchetypeVersion=1.2.3-Boron-SR3
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn org.apache.maven.plugins:maven-archetype-plugin:2.4:generate -DarchetypeGroupId&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;org.opendaylight.controller -DarchetypeArtifactId&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;opendaylight-startup-archetype -DarchetypeRepository&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;opendaylight.release/ -DarchetypeCatalog&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;http://nexus.opendaylight.org/content/repositories/opendaylight.snapshot/archetype-catalog.xml -DarchetypeVersion&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1.2.3-Boron-SR3
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;p&gt;The tutorial is actually using &lt;code class=&quot;highlighter-rouge&quot;&gt;classPrefix&lt;/code&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;Hello&lt;/code&gt; instead of &lt;code class=&quot;highlighter-rouge&quot;&gt;hello&lt;/code&gt;:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Define value for property 'classPrefix': Hello
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Define value for property 'groupId': : org.opendaylight.hello
+Define value for property 'artifactId': : hello
+Define value for property 'version': 1.0-SNAPSHOT
+Define value for property 'package':  org.opendaylight.hello: : 
+Define value for property 'classPrefix':  Hello
+Define value for property 'copyright': : Yoyodyne, Inc.
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;build &lt;code class=&quot;highlighter-rouge&quot;&gt;hello&lt;/code&gt; project using&lt;/p&gt;
+&lt;p&gt;到这里我们只是有了一个符合maven结构的目录框架，想要运行还需要在project根目录下build &lt;code class=&quot;highlighter-rouge&quot;&gt;hello&lt;/code&gt; project&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn clean install
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;然后运行&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;./karaf/target/assembly/bin/karaf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;看到下面的显示就说明成功了&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;opendaylight-user@root&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h4 id=&quot;implement-helloworld-rpc-api&quot;&gt;Implement &lt;code class=&quot;highlighter-rouge&quot;&gt;HelloWorld&lt;/code&gt; RPC API&lt;/h4&gt;
+&lt;p&gt;首先修改hello.yang, 定义一个叫hello-world的rpc，为了最后可以用REST的方式调用&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim ~/hello/api/src/main/yang/hello.yang
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;module hello {
+    yang-version 1;
+    namespace &quot;urn:opendaylight:params:xml:ns:yang:hello&quot;;
+    prefix &quot;hello&quot;;
+
+    revision &quot;2015-01-05&quot; {
+        description &quot;Initial revision of hello model&quot;;
+    }
+    rpc hello-world {
+        input {
+            leaf name {
+                type string;
+            }
+        }
+        output {
+            leaf greeting {
+                type string;
+            }
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;然后建立 &lt;code class=&quot;highlighter-rouge&quot;&gt;HelloWorldImple.java&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim ~/hello/impl/src/main/java/org/opendaylight/hello/impl/HelloWorldImpl.java
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;opendaylight&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;hello&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;impl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.concurrent.Future&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.hello.rev150105.HelloService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.hello.rev150105.HelloWorldInput&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.hello.rev150105.HelloWorldOutput&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.hello.rev150105.HelloWorldOutputBuilder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.opendaylight.yangtools.yang.common.RpcResult&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.opendaylight.yangtools.yang.common.RpcResultBuilder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;HelloWorldImpl&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HelloService&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Future&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RpcResult&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HelloWorldOutput&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;helloWorld&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HelloWorldInput&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;HelloWorldOutputBuilder&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;helloBuilder&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HelloWorldOutputBuilder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;helloBuilder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setGreeting&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Hello &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RpcResultBuilder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;success&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;helloBuilder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;build&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;buildFuture&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;然后注册rpc。只有在MD-SAL注册了，从外面调用一个rpc的时候，MD-SAL才知道去找哪个provider.注册分两步，分别要修改impl-blueprint.xml和HelloProvider.java&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim hello/impl/src/main/resources/org/opendaylight/blueprint/impl-blueprint.xml
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&lt;/span&gt;
+ &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- vi: set et smarttab sw=4 tabstop=4: --&amp;gt;&lt;/span&gt;
+ &lt;span class=&quot;c&quot;&gt;&amp;lt;!--
+ Copyright © 2016 Cisco Systems and others. All rights reserved.
+ 
+ This program and the accompanying materials are made available under the
+ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ and is available at http://www.eclipse.org/legal/epl-v10.html
+ --&amp;gt;&lt;/span&gt;
+ &lt;span class=&quot;nt&quot;&gt;&amp;lt;blueprint&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.osgi.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;
+   &lt;span class=&quot;na&quot;&gt;xmlns:odl=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://opendaylight.org/xmlns/blueprint/v1.0.0&quot;&lt;/span&gt;
+   &lt;span class=&quot;na&quot;&gt;odl:use-default-for-reference-types=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+  
+   &lt;span class=&quot;nt&quot;&gt;&amp;lt;reference&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;dataBroker&quot;&lt;/span&gt;
+     &lt;span class=&quot;na&quot;&gt;interface=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.controller.md.sal.binding.api.DataBroker&quot;&lt;/span&gt;
+     &lt;span class=&quot;na&quot;&gt;odl:type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;default&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+ 
+   &lt;span class=&quot;nt&quot;&gt;&amp;lt;reference&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;rpcRegistry&quot;&lt;/span&gt;
+     &lt;span class=&quot;na&quot;&gt;interface=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.controller.sal.binding.api.RpcProviderRegistry&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;'''
+ 
+   &lt;span class=&quot;nt&quot;&gt;&amp;lt;bean&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;provider&quot;&lt;/span&gt;
+     &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.opendaylight.spark.impl.HelloProvider&quot;&lt;/span&gt;
+     &lt;span class=&quot;na&quot;&gt;init-method=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;init&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;destroy-method=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;close&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+     &lt;span class=&quot;nt&quot;&gt;&amp;lt;argument&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ref=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;dataBroker&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+     &lt;span class=&quot;nt&quot;&gt;&amp;lt;argument&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ref=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;rpcRegistry&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/bean&amp;gt;&lt;/span&gt;
+ 
+ &lt;span class=&quot;nt&quot;&gt;&amp;lt;/blueprint&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;保存退出，接着&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim hello/imp/src/main/java/org/opendaylight/hello/impl/HelloProvider.java
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cm&quot;&gt;/*
+ * Copyright © 2016 Cisco Systems and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;opendaylight&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;hello&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;impl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.opendaylight.controller.md.sal.binding.api.DataBroker&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.opendaylight.controller.sal.binding.api.RpcProviderRegistry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.opendaylight.controller.sal.binding.api.BindingAwareBroker.RpcRegistration&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.hello.rev150105.HelloService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.slf4j.Logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.slf4j.LoggerFactory&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;HelloProvider&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LOG&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LoggerFactory&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getLogger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HelloProvider&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DataBroker&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dataBroker&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RpcProviderRegistry&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rpcProviderRegistry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RpcRegistration&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HelloService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;serviceRegistration&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;HelloProvider&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DataBroker&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dataBroker&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RpcProviderRegistry&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rpcProviderRegistry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;dataBroker&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dataBroker&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;rpcProviderRegistry&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rpcProviderRegistry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;cm&quot;&gt;/**
+     * Method called when the blueprint container is created.
+     */&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    	&lt;span class=&quot;n&quot;&gt;serviceRegistration&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rpcProviderRegistry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addRpcImplementation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HelloService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HelloWorldImpl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;LOG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;HelloProvider Session Initiated&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;cm&quot;&gt;/**
+     * Method called when the blueprint container is destroyed.
+     */&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    	&lt;span class=&quot;n&quot;&gt;serviceRegistration&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;LOG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;HelloProvider Closed&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;然后在hello project下再install一次&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn clean install
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
+&lt;p&gt;如果遇到了下面这个错误的话&lt;/p&gt;
 
-&lt;h4 id=&quot;implement-helloworld-rpc-api&quot;&gt;Implement &lt;code class=&quot;highlighter-rouge&quot;&gt;HelloWorld&lt;/code&gt; RPC API&lt;/h4&gt;
-&lt;p&gt;First create &lt;code class=&quot;highlighter-rouge&quot;&gt;HelloWorldImple.java&lt;/code&gt; file then&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd hello/impl/src/main/resources/org/opendaylight/blueprint/
-
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;and revise &lt;code class=&quot;highlighter-rouge&quot;&gt;impl-blueprint.xml&lt;/code&gt; file, then walk with the tutorial, if you have this error after &lt;code class=&quot;highlighter-rouge&quot;&gt;mvn clean build&lt;/code&gt;:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[ERROR] src/main/java/org/opendaylight/hello/impl/HelloWorldImpl.java[1] (header) RegexpHeader: Line does not match expected header line of '^/[]+$'.
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;ERROR] src/main/java/org/opendaylight/hello/impl/HelloWorldImpl.java[1] &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;header&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; RegexpHeader: Line does not match expected header line of &lt;span class=&quot;s1&quot;&gt;'^/[]+$'&lt;/span&gt;.
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;you can try with this:&lt;/p&gt;
+&lt;p&gt;可以尝试这个命令&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn clean install -Dcheckstyle.skip
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn clean install -Dcheckstyle.skip
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h4 id=&quot;test-the-hello-world-rpc-via-rest&quot;&gt;Test the ‘hello-world’ RPC via REST&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/images/2017/OpenDaylight-startup.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h3 id=&quot;test-the-hello-world-rpc-via-rest&quot;&gt;Test the &lt;code class=&quot;highlighter-rouge&quot;&gt;hello-world&lt;/code&gt; RPC via REST&lt;/h3&gt;
+&lt;p&gt;最后登录&lt;code class=&quot;highlighter-rouge&quot;&gt;localhost:8181/apidoc/explorer/index.html&lt;/code&gt;
+点击&lt;code class=&quot;highlighter-rouge&quot;&gt;hello(2015-01-05)&lt;/code&gt; 和 &lt;code class=&quot;highlighter-rouge&quot;&gt;POST /operations/hello:hello-world&lt;/code&gt;, 输入&lt;code class=&quot;highlighter-rouge&quot;&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;hello:input&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Your Name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}}&lt;/span&gt;&lt;/code&gt;,点击&lt;code class=&quot;highlighter-rouge&quot;&gt;Try it out&lt;/code&gt;就能得到下面的结果了
+&lt;img src=&quot;/assets/images/2017/OpenDaylight-startup.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 </description>
         <pubDate>Fri, 23 Jun 2017 19:10:00 +0800</pubDate>
-        <link>http://localhost:4000/2017/06/OpenDaylight-get-started/</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/06/OpenDaylight-get-started/</guid>
+        <link>http://localhost:4000/2017/06/OpenDaylight-HelloProject/</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/06/OpenDaylight-HelloProject/</guid>
         
         <category>OpenDaylight,</category>
         
-        <category>startup</category>
+        <category>Hello,</category>
         
-        
-      </item>
-    
-      <item>
-        <title>Hello World - Vno</title>
-        <description>&lt;h4 id=&quot;whats-this&quot;&gt;What’s this&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/onevcat/vno-jekyll&quot;&gt;Vno Jekyll&lt;/a&gt; is a theme for &lt;a href=&quot;http://jekyllrb.com&quot;&gt;Jekyll&lt;/a&gt;. It is a port of my Ghost theme &lt;a href=&quot;https://github.com/onevcat/vno&quot;&gt;vno&lt;/a&gt;, which is originally developed from &lt;a href=&quot;https://github.com/daleanthony/uno&quot;&gt;Dale Anthony’s Uno&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h4 id=&quot;usage&quot;&gt;Usage&lt;/h4&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;git clone https://github.com/onevcat/vno-jekyll.git your_site
-&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;your_site
-&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;bundler install
-&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;bundler &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;jekyll serve
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Your site with &lt;code class=&quot;highlighter-rouge&quot;&gt;Vno Jekyll&lt;/code&gt; enabled should be accessible in http://127.0.0.1:4000.&lt;/p&gt;
-
-&lt;p&gt;For more information about Jekyll, please visit &lt;a href=&quot;http://jekyllrb.com&quot;&gt;Jekyll’s site&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h4 id=&quot;configuration&quot;&gt;Configuration&lt;/h4&gt;
-
-&lt;p&gt;All configuration could be done in &lt;code class=&quot;highlighter-rouge&quot;&gt;_config.yml&lt;/code&gt;. Remember you need to restart to serve the page when after changing the config file. Everything in the config file should be self-explanatory.&lt;/p&gt;
-
-&lt;h4 id=&quot;background-image-and-avatar&quot;&gt;Background image and avatar&lt;/h4&gt;
-
-&lt;p&gt;You could replace the background and avatar image in &lt;code class=&quot;highlighter-rouge&quot;&gt;assets/images&lt;/code&gt; folder to change them.&lt;/p&gt;
-
-&lt;h4 id=&quot;sites-using-vno&quot;&gt;Sites using Vno&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://onevcat.com&quot;&gt;My blog&lt;/a&gt; is using &lt;code class=&quot;highlighter-rouge&quot;&gt;Vno Jekyll&lt;/code&gt; as well, you could see how it works in real. There are some other sites using the same theme. You can find them below:&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th&gt;Site Name&lt;/th&gt;
-      &lt;th&gt;URL&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;OneV’s Den&lt;/td&gt;
-      &lt;td&gt;&lt;a href=&quot;http://onevcat.com&quot;&gt;http://onevcat.com&lt;/a&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;July Tang&lt;/td&gt;
-      &lt;td&gt;&lt;a href=&quot;http://onevcat.com&quot;&gt;http://blog.julytang.xyz&lt;/a&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;If you happen to be using this theme, welcome to &lt;a href=&quot;https://github.com/onevcat/vno-jekyll/pulls&quot;&gt;send me a pull request&lt;/a&gt; to add your site link here. :)&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h4 id=&quot;license&quot;&gt;License&lt;/h4&gt;
-
-&lt;p&gt;Great thanks to &lt;a href=&quot;https://github.com/daleanthony&quot;&gt;Dale Anthony&lt;/a&gt; and his &lt;a href=&quot;https://github.com/daleanthony/uno&quot;&gt;Uno&lt;/a&gt;. Vno Jekyll is based on Uno, and contains a lot of modification on page layout, animation, font and some more things I can not remember. Vno Jekyll is followed with Uno and be licensed as &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot;&gt;Creative Commons Attribution 4.0 International&lt;/a&gt;. See the link for more information.&lt;/p&gt;
-</description>
-        <pubDate>Tue, 16 Feb 2016 14:32:24 +0800</pubDate>
-        <link>http://localhost:4000/2016/02/hello-world-vno/</link>
-        <guid isPermaLink="true">http://localhost:4000/2016/02/hello-world-vno/</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Sample Post</title>
-        <description>&lt;p&gt;You’ll find this post in your &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code class=&quot;highlighter-rouge&quot;&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
-
-&lt;p&gt;To add new posts, simply add a file in the &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory that follows the convention &lt;code class=&quot;highlighter-rouge&quot;&gt;YYYY-MM-DD-name-of-post.ext&lt;/code&gt; and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
-
-&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Tom'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints 'Hi, Tom' to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Check out the &lt;a href=&quot;http://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;
-
-</description>
-        <pubDate>Mon, 15 Feb 2016 14:32:24 +0800</pubDate>
-        <link>http://localhost:4000/2016/02/sample-post/</link>
-        <guid isPermaLink="true">http://localhost:4000/2016/02/sample-post/</guid>
+        <category>Project</category>
         
         
       </item>
