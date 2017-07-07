@@ -24,11 +24,11 @@ P4 is short for [Programming Protocol-Independent Packet Processors](http://www.
 
 ### **Example: Very Simple Switch**
 Very Simple Switch的architecture长这样:  
-#
+
 
 ![](/assets/images/2017/Very-Simple-Switch-Architecture.PNG)
 
-#
+
 
 1. 每个target的input方式有三种，**packet in**, **CPU** (central controller), **Recirculate** (从output port重新导回来的)，output方式也是一样
 2. 白色的部分都是需要user自己定义的，包括**parser**, **Match-action pipeline**, **Deparser**。因为parser决定了如何去拆解packet，而这部分是user写的，也就是说user决定了要用什么protocol，甚至想创造出什么的protocol(不考虑switch以外的因素)  
@@ -170,10 +170,10 @@ extern Checksum16 {
 ```
 
 #### **Very Simple Switch完整代码**
-####
+
 代码的处理流程如下:  
 ![](/assets/images/2017/match-action_pipeline_expressed_by_VSS.PNG)  
-####
+
 
 可以看到这里没有使用到recirculation功能。首先parser会识别**Ethernet**和**IPv4** header,如果其中一个除了问题，就会报错，然后drop。没错误的话就会把header抽出来放到**Parsed_packet**,然后再进行一系列的match-action：
 >* If any parser error has occurred, the packet is dropped (i.e., by assigning outputPort to DROP_PORT)
