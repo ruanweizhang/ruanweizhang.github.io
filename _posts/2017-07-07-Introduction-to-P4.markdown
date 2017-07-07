@@ -26,7 +26,7 @@ P4 is short for [Programming Protocol-Independent Packet Processors](http://www.
 Very Simple Switch的architecture长这样:  
 #
 
-<img src="/assets/images/2017/Very-Simple-Switch-Architecture.PNG" width="80%" />
+![](/assets/images/2017/Very-Simple-Switch-Architecture.PNG)
 
 #
 
@@ -172,7 +172,7 @@ extern Checksum16 {
 #### **Very Simple Switch完整代码**
 ####
 代码的处理流程如下:  
-<img src="/assets/images/2017/match-action_pipeline_expressed_by_VSS.png" width="80%" />  
+![](/assets/images/2017/match-action_pipeline_expressed_by_VSS.PNG)  
 ####
 
 可以看到这里没有使用到recirculation功能。首先parser会识别**Ethernet**和**IPv4** header,如果其中一个除了问题，就会报错，然后drop。没错误的话就会把header抽出来放到**Parsed_packet**,然后再进行一系列的match-action：

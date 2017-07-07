@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>Introduction to P4 Progamming Language</title>
+  <meta name="description" content="写在前面：这篇文章的内容都是来源于官网，Tutorial, Spec等等公开的资料，欢迎分享，并注明出处what is P4P4 is short for Programming Protocol-Independent Packet Processors，它是一门编程语言，详细的介绍可以看链接的paper。它是...">
+  <meta name="author" content="Wei Wang">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Introduction to P4 Progamming Language">
+  <meta name="twitter:description" content="写在前面：这篇文章的内容都是来源于官网，Tutorial, Spec等等公开的资料，欢迎分享，并注明出处what is P4P4 is short for Programming Protocol-Independent Packet Processors，它是一门编程语言，详细的介绍可以看链接的paper。它是...">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Introduction to P4 Progamming Language">
+  <meta property="og:description" content="写在前面：这篇文章的内容都是来源于官网，Tutorial, Spec等等公开的资料，欢迎分享，并注明出处what is P4P4 is short for Programming Protocol-Independent Packet Processors，它是一门编程语言，详细的介绍可以看链接的paper。它是...">
+  
+  <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
+  <link href="/assets/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://localhost:4000/2017/07/Introduction-to-P4/">
+  <link rel="alternate" type="application/rss+xml" title="Ruan Weizhang" href="http://localhost:4000/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+  
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">
+        <i class="fa fa-list btn-mobile-menu__icon"></i>
+        <i class="fa fa-angle-up btn-mobile-close__icon hidden"></i>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/assets/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <a href="/#blog" title="前往 Ruan Weizhang 的主页" class="blog-button"><img src="/assets/images/avatar.jpg" width="80" alt="Ruan Weizhang logo" class="panel-cover__logo logo" /></a>
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for Ruan Weizhang" class="blog-button">Ruan Weizhang</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">Welcome to my blog</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description"></p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="Visit blog" class="blog-button">Blog</a></li>
+                
+              </ul>
+            </nav>
+          </div>
+          
+          <div><nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+  
+  <!-- Facebook -->
+  <li class="navigation__item">
+    <a href="http://facebook.com/ruanweizhang" title="@ruanweizhang 的脸书" target="_blank">
+      <i class='social fa fa-facebook'></i>
+      <span class="label">Facebook</span>
+    </a>
+  </li>
+  
+
+
+  
+
+  
+  <!-- Github -->
+  <li class="navigation__item">
+    <a href="https://github.com/ruanweizhang" title="@ruanweizhang 的 Github" target="_blank">
+      <i class='social fa fa-github'></i>
+      <span class="label">Github</span>
+    </a>
+  </li>
+  
+  
+  
+
+  
+
+  <!-- RSS -->
+  <li class="navigation__item">
+    <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+      <i class='social fa fa-rss'></i>
+      <span class="label">RSS</span>
+    </a>
+  </li>
+
+  
+  <!-- Email -->
+  <li class="navigation__item">
+    <a href="mailto:ruanweizhang@gmail.com" title="Contact me">
+      <i class='social fa fa-envelope'></i>
+      <span class="label">Email</span>
+    </a>
+  </li>
+  
+
+  </ul>
+</nav>
+</div>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-disabled"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <div class="post-meta">
+      <time datetime="2017-07-07 15:04:00 +0800" itemprop="datePublished" class="post-meta__date date">2017-07-07</time> &#8226; <span class="post-meta__tags tags">Introduction,P4,ProgrammingLanguage</span>
+    </div>
+    <h1 class="post-title">Introduction to P4 Progamming Language</h1>
+  </header>
+
+  <section class="post">
+    <p>写在前面：这篇文章的内容都是来源于<a href="p4.org">官网</a>，<a href="https://github.com/p4lang/tutorials/blob/master/SIGCOMM_2016/p4-tutorial-slides.pdf">Tutorial</a>, <a href="https://p4lang.github.io/p4-spec/">Spec</a>等等公开的资料，欢迎分享，并注明出处</p>
+
+<h3 id="what-is-p4"><strong>what is P4</strong></h3>
+<p>P4 is short for <a href="http://www.sigcomm.org/sites/default/files/ccr/papers/2014/July/0000000-0000004.pdf">Programming Protocol-Independent Packet Processors</a>，它是一门编程语言，详细的介绍可以看链接的paper。它是运行在switch上面的一种language，能够让switch像小型电脑一样，按照user的意愿处理packet。它有以下特点：</p>
+
+<ul>
+  <li><strong>Protocol Independent</strong>: switch事前不需要任何protocol的知识，完全是user自己定义的，也就是说自己想写一个新的protocol完全没问题(如果完全不考虑switch以外的任何因素</li>
+  <li><strong>Target Independent</strong>: 完全不用考虑switch硬件，就像只要是x86电脑装了VS，写个c++然后compile一下就能运行，而不需要知道CPU怎么运作的。因为不只是用在switch，还可以用在很多硬件上，所以官网称这些硬件为target</li>
+  <li><strong>Field Reconfigurable</strong> 其实就是programmable，可以重新编写对packet的parsing和processing</li>
+</ul>
+
+<h3 id="why-p4"><strong>why P4</strong></h3>
+<p>目的就是解决目前OpenFlow的痛点:</p>
+<ul>
+  <li>Central controller is not scalable, 因为所有packet in都传到了central controller。但是如果switch能够简单处理packet，就能减少很多packet in</li>
+  <li>OpenFlow每一种protocol/Header Fields都需要事先写好，随着支援的protocol/Header Fields原来越多，体量只会越来越大，但是很多时候要控制的网络可能只需要用到一部分protocol/Header Fields。openFlow从2009年支援12种Header Fields，到2013年增加到了41种</li>
+  <li>P4和OpenFlow是相辅相成的，相当于将部分智慧从central controller拉回到switch。它们并不是互相排斥关系，而是可以同时使用。</li>
+</ul>
+
+<p>目前来看，只要是p4没有定义的protocol，即使OpenFlow支援也不能使用。</p>
+
+<h3 id="example-very-simple-switch"><strong>Example: Very Simple Switch</strong></h3>
+<p>Very Simple Switch的architecture长这样:
+#</p>
+
+<p><img src="/assets/images/2017/Very-Simple-Switch-Architecture.PNG" alt="" /></p>
+
+<p>#</p>
+
+<ol>
+  <li>每个target的input方式有三种，<strong>packet in</strong>, <strong>CPU</strong> (central controller), <strong>Recirculate</strong> (从output port重新导回来的)，output方式也是一样</li>
+  <li>白色的部分都是需要user自己定义的，包括<strong>parser</strong>, <strong>Match-action pipeline</strong>, <strong>Deparser</strong>。因为parser决定了如何去拆解packet，而这部分是user写的，也就是说user决定了要用什么protocol，甚至想创造出什么的protocol(不考虑switch以外的因素)</li>
+  <li>浅灰色的部分是fixed-function blocks，也就是不用user写的，包括<strong>Arbiter</strong>, <strong>parser runtime</strong>, <strong>Demux</strong>
+,下面介绍他们的功能，我直接copy Spec里面的介绍，英文不算难，就不翻译了</li>
+</ol>
+
+<h5 id="arbiter"><strong>Arbiter</strong></h5>
+<blockquote>
+  <ul>
+    <li>It receives packets from one of the physical input Ethernet ports, from the control plane, or from
+the input recirculation port.</li>
+    <li>For packets received from Ethernet ports, the block computes the Ethernet trailer checksum and
+verifies it. If the checksum does not match, the packet is discarded. If the checksum does match,
+it is removed from the packet payload.</li>
+    <li>Receiving a packet involves running an arbitration algorithm if multiple packets are available.</li>
+    <li>If the arbiter block is busy processing a previous packet and no queue space is available, input
+ports may drop arriving packets, without indicating the fact that the packets were dropped in any
+way.</li>
+    <li>After receiving a packet, the arbiter block sets the inCtrl.inputPort value that is an input to the
+parser with the identity of the input port where the packet originated. Physical Ethernet ports are
+numbered 0 to 7, while the input recirculation port has a number 13 and the CPU port has the
+number 14.</li>
+  </ul>
+</blockquote>
+
+<h5 id="parser-runtime"><strong>parser runtime</strong></h5>
+<blockquote>
+  <p>The parser runtime block works in concert with the parser. It provides an error code to the matchaction
+pipeline, based on the parser actions, and it provides information about the packet payload
+(e.g., the size of the remaining payload data) to the demux block. As soon as a packet’s processing is
+completed by the parser, the match-action pipeline is invoked with the associated metadata as inputs
+(packet headers and user-defined metadata).<br />
+The run-time system contains implementations of basic low-level commands and may also implement higher-level commands and may support type checking, debugging, and even code generation and optimization.</p>
+</blockquote>
+
+<p>其实就是辅助parser运行的</p>
+
+<h5 id="demux"><strong>Demux</strong></h5>
+<blockquote>
+  <p>The core functionality of the demux block is to receive the headers for the outgoing packet from the
+deparser and the packet payload from the parser, to assemble them into a new packet and to send the
+result to the correct output port. The output port is specified by the value of outCtrl.ouputPort, which
+is set by the match-action pipeline.</p>
+  <ul>
+    <li>Sending the packet to the drop port causes the packet to disappear.</li>
+    <li>Sending the packet to an output Ethernet port numbered between 0 and 7 causes it to be emitted
+on the corresponding physical interface. The packet may be placed in a queue if the output interface
+is already busy emitting another packet. When the packet is emitted, the physical interface
+computes a correct Ethernet checksum trailer and appends it to the packet.</li>
+    <li>Sending a packet to the output CPU port causes the packet to be transferred to the control plane.
+In this case, the packet that is sent to the CPU is the original input packet, and not the packet
+received from the deparser—the latter packet is discarded.</li>
+    <li>Sending the packet to the output recirculation port causes it to appear at the input recirculation
+port. Recirculation is useful when packet processing cannot be completed in a single pass.</li>
+    <li>If the outputPort has an illegal value (e.g., 9), the packet is dropped.</li>
+    <li>Finally, if the demux unit is busy processing a previous packet and there is no capacity to queue
+the packet coming from the deparser, the demux unit may drop the packet, irrespective of the
+output port indicated.</li>
+  </ul>
+</blockquote>
+
+<h3 id="very-simple-switch开发思路"><strong>Very Simple Switch开发思路</strong></h3>
+<p>其实思路很简单，既然只有三个module是可以供user开发的,那个user只需要分别定义好三个module，然后把他们串联起来就完成开发了，是不是很简单lol，下面我们先看例子</p>
+
+<h3 id="very-simple-switch框架"><strong>Very Simple Switch框架</strong></h3>
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="c1">// File "very_simple_switch_model.p4"，扩展名是p4
+// Very Simple Switch P4 declaration
+// core library needed for packet_in and packet_out definitions
+</span><span class="cp"># include &lt;core.p4&gt;
+</span>
+<span class="cm">/* Various constants and structure declarations */</span>
+<span class="cm">/* ports are represented using 4-bit values */</span>
+<span class="k">typedef</span> <span class="n">bit</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span> <span class="n">PortId</span><span class="p">;</span>
+
+<span class="cm">/* only 8 ports are "real" */</span>
+<span class="k">const</span> <span class="n">PortId</span> <span class="n">REAL_PORT_COUNT</span> <span class="o">=</span> <span class="mi">4</span><span class="n">w8</span><span class="p">;</span> <span class="c1">// 4w8 is the unsigned number 8 in 4 bits, w代表unsigned, 只有8个有效port，目前还不知道为什么这么少port，先留个坑，以后来解答
+</span>
+<span class="cm">/* metadata accompanying an input packet */</span>
+<span class="k">struct</span> <span class="n">InControl</span> <span class="p">{</span>
+  <span class="n">PortId</span> <span class="n">inputPort</span><span class="p">;</span> <span class="c1">//利用了刚定义的PortId
+</span><span class="p">}</span>
+
+<span class="cm">/* special input port values */</span>
+<span class="k">const</span> <span class="n">PortId</span> <span class="n">RECIRCULATE_IN_PORT</span> <span class="o">=</span> <span class="mh">0xD</span><span class="p">;</span> <span class="c1">// 13 for recirculation
+</span><span class="k">const</span> <span class="n">PortId</span> <span class="n">CPU_IN_PORT</span> <span class="o">=</span> <span class="mh">0xE</span><span class="p">;</span> <span class="c1">// 14 for CPU， 也就是controller
+</span>
+<span class="cm">/* metadata that must be computed for outgoing packets */</span>
+<span class="k">struct</span> <span class="n">OutControl</span> <span class="p">{</span>
+  <span class="n">PortId</span> <span class="n">outputPort</span><span class="p">;</span> <span class="c1">//利用刚才定义的PortId
+</span><span class="p">}</span>
+
+<span class="cm">/* special output port values for outgoing packet */</span>
+<span class="k">const</span> <span class="n">PortId</span> <span class="n">DROP_PORT</span> <span class="o">=</span> <span class="mh">0xF</span><span class="p">;</span> <span class="c1">//14 for drop
+</span><span class="k">const</span> <span class="n">PortId</span> <span class="n">CPU_OUT_PORT</span> <span class="o">=</span> <span class="mh">0xE</span><span class="p">;</span>
+<span class="k">const</span> <span class="n">PortId</span> <span class="n">RECIRCULATE_OUT_PORT</span> <span class="o">=</span> <span class="mh">0xD</span><span class="p">;</span>
+
+
+<span class="cm">/* Prototypes for all programmable blocks */</span>
+<span class="cm">/**
+* Programmable parser.
+* @param &lt;H&gt; type of headers; defined by user
+* @param b input packet
+* @param parsedHeaders headers constructed by parser
+*/</span>
+<span class="n">parser</span> <span class="n">Parser</span><span class="o">&lt;</span><span class="n">H</span><span class="o">&gt;</span><span class="p">(</span><span class="n">packet_in</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span> <span class="n">H</span> <span class="n">parsedHeaders</span><span class="p">);</span> <span class="c1">// 类型packet_in的定义在core.p4, output的类型是自定义的H，关键字out表示变量parsedHeaders还没初始化，而且可以被改变值
+</span>
+
+<span class="cm">/**
+* Match-action pipeline
+* @param &lt;H&gt; type of input and output headers
+* @param headers headers received from the parser and sent to the deparser
+* @param parseError error that may have surfaced during parsing
+* @param inCtrl information from architecture, accompanying input packet
+* @param outCtrl information for architecture, accompanying output packet
+*/</span>
+<span class="n">control</span> <span class="n">Pipe</span><span class="o">&lt;</span><span class="n">H</span><span class="o">&gt;</span><span class="p">(</span><span class="n">inout</span> <span class="n">H</span> <span class="n">headers</span><span class="p">,</span> <span class="c1">// inout表示既是input类型也是output类型
+</span><span class="n">in</span> <span class="n">error</span> <span class="n">parseError</span><span class="p">,</span><span class="c1">// parser error， 来自parser runtime的error input
+</span><span class="n">in</span> <span class="n">InControl</span> <span class="n">inCtrl</span><span class="p">,</span> <span class="c1">// input port
+</span><span class="n">out</span> <span class="n">OutControl</span> <span class="n">outCtrl</span><span class="p">);</span> <span class="c1">// output port
+</span>
+
+<span class="cm">/**
+* VSS deparser.
+* @param &lt;H&gt; type of headers; defined by user
+* @param b output packet
+* @param outputHeaders headers for output packet
+*/</span>
+<span class="n">control</span> <span class="n">Deparser</span><span class="o">&lt;</span><span class="n">H</span><span class="o">&gt;</span><span class="p">(</span><span class="n">inout</span> <span class="n">H</span> <span class="n">outputHeaders</span><span class="p">,</span>  <span class="n">packet_out</span> <span class="n">b</span><span class="p">);</span> <span class="c1">//packet_out类型的定义同样在core.p4
+</span>
+
+<span class="cm">/**
+* Top-level package declaration - must be instantiated by user.
+* The arguments to the package indicate blocks that
+* must be instantiated by the user.
+* @param &lt;H&gt; user-defined type of the headers processed.
+*/</span>
+<span class="n">package</span> <span class="n">VSS</span><span class="o">&lt;</span><span class="n">H</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Parser</span><span class="o">&lt;</span><span class="n">H</span><span class="o">&gt;</span> <span class="n">p</span><span class="p">,</span> <span class="n">Pipe</span><span class="o">&lt;</span><span class="n">H</span><span class="o">&gt;</span> <span class="n">map</span><span class="p">,</span> <span class="n">Deparser</span><span class="o">&lt;</span><span class="n">H</span><span class="o">&gt;</span> <span class="n">d</span><span class="p">);</span> <span class="c1">//将三个user self-defined的module串联起来就是我们的Very Simple Switch(VSS)咯
+</span>
+<span class="c1">// Architecture-specific objects that can be instantiated，一个可以供这个architecture调用的external block
+// Checksum unit
+</span><span class="k">extern</span> <span class="n">Checksum16</span> <span class="p">{</span>
+  <span class="n">Checksum16</span><span class="p">();</span> <span class="c1">// constructor
+</span>  <span class="kt">void</span> <span class="n">clear</span><span class="p">();</span> <span class="c1">// prepare unit for computation，初始化checksum unit
+</span>  <span class="kt">void</span> <span class="n">update</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">in</span> <span class="n">T</span> <span class="n">data</span><span class="p">);</span> <span class="c1">// add data to checksum,往unit里面添加数据
+</span>  <span class="kt">void</span> <span class="n">remove</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">in</span> <span class="n">T</span> <span class="n">data</span><span class="p">);</span> <span class="c1">// remove data from existing checksum，从unit里面删掉数据
+</span>  <span class="n">bit</span><span class="o">&lt;</span><span class="mi">16</span><span class="o">&gt;</span> <span class="n">get</span><span class="p">();</span> <span class="c1">// get the checksum for the data added since last clear，执行checksum获得结果
+</span><span class="p">}</span>
+</code></pre>
+</div>
+
+<h4 id="very-simple-switch完整代码"><strong>Very Simple Switch完整代码</strong></h4>
+<h3>#</h3>
+<p>代码的处理流程如下:<br />
+<img src="/assets/images/2017/match-action_pipeline_expressed_by_VSS.PNG" alt="" /></p>
+<h3 id="-1">#</h3>
+
+<p>可以看到这里没有使用到recirculation功能。首先parser会识别<strong>Ethernet</strong>和<strong>IPv4</strong> header,如果其中一个除了问题，就会报错，然后drop。没错误的话就会把header抽出来放到<strong>Parsed_packet</strong>,然后再进行一系列的match-action：</p>
+<blockquote>
+  <ul>
+    <li>If any parser error has occurred, the packet is dropped (i.e., by assigning outputPort to DROP_PORT)</li>
+    <li>The first table uses the IPv4 destination address to determine the outputPort and the IPv4 address
+of the next hop. If this lookup fails, the packet is dropped. The table also decrements the IPv4 ttl
+value.</li>
+    <li>The second table checks the ttl value: if the ttl becomes 0, the packet is sent to the control plane
+through the CPU port.</li>
+    <li>The third table uses the IPv4 address of the next hop (which was computed by the first table) to
+determine the Ethernet address of the next hop.</li>
+    <li>Finally, the last table uses the outputPort to identify the source Ethernet address of the current
+switch, which is set in the outgoing packet.</li>
+  </ul>
+</blockquote>
+
+<p>Match-ations结束之后，deparser会重新将packet组装起来并送到设定好的output port。源代码如下：</p>
+
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="c1">// Include P4 core library
+</span><span class="cp"># include &lt;core.p4&gt;
+</span><span class="c1">// Include very simple switch architecture declarations
+</span><span class="cp"># include "very_simple_switch_model.p4" //将我们上面写好的框架include进来
+</span>
+<span class="c1">// This program processes packets comprising an Ethernet and an IPv4
+// header, and it forwards packets using the destination IP address
+</span><span class="k">typedef</span> <span class="n">bit</span><span class="o">&lt;</span><span class="mi">48</span><span class="o">&gt;</span> <span class="n">EthernetAddress</span><span class="p">;</span> <span class="c1">//自定义48个bit的新的类型叫EthernetAddress
+</span><span class="k">typedef</span> <span class="n">bit</span><span class="o">&lt;</span><span class="mi">32</span><span class="o">&gt;</span> <span class="n">IPv4Address</span><span class="p">;</span>    <span class="c1">//自定义32个bit的新的类型叫IPv4Address
+</span>
+<span class="c1">// Standard Ethernet header
+</span><span class="n">header</span> <span class="n">Ethernet_h</span> <span class="p">{</span> <span class="c1">//user定义Ethernet_h header长什么样，也就是这里体现出Protocol-Independent的特点
+</span>  <span class="n">EthernetAddress</span> <span class="n">dstAddr</span><span class="p">;</span> <span class="c1">//定义类型是EthernetAddress的变数dstAddr
+</span>  <span class="n">EthernetAddress</span> <span class="n">srcAddr</span><span class="p">;</span> <span class="c1">//定义类型是EthernetAddress的变数srcAddr
+</span>  <span class="n">bit</span><span class="o">&lt;</span><span class="mi">16</span><span class="o">&gt;</span> <span class="n">etherType</span><span class="p">;</span> <span class="c1">//16位的变数
+</span><span class="p">}</span>
+
+<span class="c1">// IPv4 header (without options)
+</span><span class="n">header</span> <span class="n">IPv4_h</span> <span class="p">{</span>  <span class="c1">//user定义IPv4_h header长什么样
+</span>  <span class="n">bit</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span> <span class="n">version</span><span class="p">;</span>
+  <span class="n">bit</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">&gt;</span> <span class="n">ihl</span><span class="p">;</span>
+  <span class="n">bit</span><span class="o">&lt;</span><span class="mi">8</span><span class="o">&gt;</span> <span class="n">diffserv</span><span class="p">;</span>
+  <span class="n">bit</span><span class="o">&lt;</span><span class="mi">16</span><span class="o">&gt;</span> <span class="n">totalLen</span><span class="p">;</span>
+  <span class="n">bit</span><span class="o">&lt;</span><span class="mi">16</span><span class="o">&gt;</span> <span class="n">identification</span><span class="p">;</span>
+  <span class="n">bit</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span> <span class="n">flags</span><span class="p">;</span>
+  <span class="n">bit</span><span class="o">&lt;</span><span class="mi">13</span><span class="o">&gt;</span> <span class="n">fragOffset</span><span class="p">;</span>
+  <span class="n">bit</span><span class="o">&lt;</span><span class="mi">8</span><span class="o">&gt;</span> <span class="n">ttl</span><span class="p">;</span>
+  <span class="n">bit</span><span class="o">&lt;</span><span class="mi">8</span><span class="o">&gt;</span> <span class="n">protocol</span><span class="p">;</span>
+  <span class="n">bit</span><span class="o">&lt;</span><span class="mi">16</span><span class="o">&gt;</span> <span class="n">hdrChecksum</span><span class="p">;</span>
+  <span class="n">IPv4Address</span> <span class="n">srcAddr</span><span class="p">;</span>
+  <span class="n">IPv4Address</span> <span class="n">dstAddr</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">// Structure of parsed headers
+</span><span class="k">struct</span> <span class="n">Parsed_packet</span> <span class="p">{</span> <span class="c1">//定义将要被parse的packet的结构
+</span>  <span class="n">Ethernet_h</span> <span class="n">ethernet</span><span class="p">;</span> <span class="c1">//第一部分是header类型是Ethernet_h的header ethernet
+</span>  <span class="n">IPv4_h</span> <span class="n">ip</span><span class="p">;</span>           <span class="c1">//第二部分是header类型是IPv4_h的header ip
+</span><span class="p">}</span>
+
+<span class="c1">// Parser section
+// User-defined errors that may be signaled during parsing
+</span><span class="n">error</span> <span class="p">{</span>
+  <span class="n">IPv4OptionsNotSupported</span><span class="p">,</span>
+  <span class="n">IPv4IncorrectVersion</span><span class="p">,</span>
+  <span class="n">IPv4ChecksumError</span>
+<span class="p">}</span>
+
+<span class="c1">//这里每个state都是相当于状态机里面的某个state，只能从一个state转移到另外一个state。整个状态机的起始点是state start，然后到达state parse_ipv4，终点是accept。到达state accept就是一次成功的parse
+</span>
+<span class="n">parser</span> <span class="n">TopParser</span><span class="p">(</span><span class="n">packet_in</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span> <span class="n">Parsed_packet</span> <span class="n">p</span><span class="p">)</span> <span class="p">{</span> <span class="c1">//Parsed_packet的定义在前面
+</span>  <span class="n">Checksum16</span><span class="p">()</span> <span class="n">ck</span><span class="p">;</span> <span class="c1">// instantiate checksum unit
+</span>  <span class="n">state</span> <span class="n">start</span> <span class="p">{</span>
+      <span class="n">b</span><span class="p">.</span><span class="n">extract</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">ethernet</span><span class="p">);</span>
+      <span class="n">transition</span> <span class="nf">select</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">ethernet</span><span class="p">.</span><span class="n">etherType</span><span class="p">)</span> <span class="p">{</span>
+        <span class="mh">0x0800</span><span class="o">:</span> <span class="n">parse_ipv4</span><span class="p">;</span>
+        <span class="c1">// no default rule: all other packets rejected
+</span>      <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="n">state</span> <span class="n">parse_ipv4</span> <span class="p">{</span>
+    <span class="n">b</span><span class="p">.</span><span class="n">extract</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">ip</span><span class="p">);</span>
+    <span class="n">verify</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">ip</span><span class="p">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">4</span><span class="n">w4</span><span class="p">,</span> <span class="n">error</span><span class="p">.</span><span class="n">IPv4IncorrectVersion</span><span class="p">);</span>
+    <span class="n">verify</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">ip</span><span class="p">.</span><span class="n">ihl</span> <span class="o">==</span> <span class="mi">4</span><span class="n">w5</span><span class="p">,</span> <span class="n">error</span><span class="p">.</span><span class="n">IPv4OptionsNotSupported</span><span class="p">);</span>
+    <span class="n">ck</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
+    <span class="n">ck</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">ip</span><span class="p">);</span>
+    <span class="c1">// Verify that packet checksum is zero
+</span>    <span class="n">verify</span><span class="p">(</span><span class="n">ck</span><span class="p">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="mi">16</span><span class="n">w0</span><span class="p">,</span> <span class="n">error</span><span class="p">.</span><span class="n">IPv4ChecksumError</span><span class="p">);</span>
+    <span class="n">transition</span> <span class="n">accept</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Match-action pipeline section，开始定义pipe
+</span><span class="n">control</span> <span class="n">TopPipe</span><span class="p">(</span><span class="n">inout</span> <span class="n">Parsed_packet</span> <span class="n">headers</span><span class="p">,</span> <span class="c1">//Parsed_packet的定义在前面，TopParser的output就是这里的input
+</span><span class="n">in</span> <span class="n">error</span> <span class="n">parseError</span><span class="p">,</span> <span class="c1">// parser error，由parser runtime提供
+</span><span class="n">in</span> <span class="n">InControl</span> <span class="n">inCtrl</span><span class="p">,</span> <span class="c1">// input port
+</span><span class="n">out</span> <span class="n">OutControl</span> <span class="n">outCtrl</span><span class="p">)</span><span class="cm">/*output port，还没初始化*/</span> <span class="p">{</span>
+
+<span class="n">IPv4Address</span> <span class="n">nextHop</span><span class="p">;</span> <span class="c1">// local variable
+</span>
+<span class="cm">/**
+* Indicates that a packet is dropped by setting the
+* output port to the DROP_PORT
+*/</span>
+<span class="n">action</span> <span class="nf">Drop_action</span><span class="p">()</span> <span class="p">{</span> <span class="c1">//这里的keyword action 对应的是OpenFlow里面的action，会改动header里面的内容
+</span>  <span class="n">outCtrl</span><span class="p">.</span><span class="n">outputPort</span> <span class="o">=</span> <span class="n">DROP_PORT</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**
+* Set the next hop and the output port.
+* Decrements ipv4 ttl field.
+* @param ivp4_dest ipv4 address of next hop
+* @param port output port
+*/</span>
+<span class="n">action</span> <span class="nf">Set_nhop</span><span class="p">(</span><span class="n">IPv4Address</span> <span class="n">ipv4_dest</span><span class="p">,</span> <span class="n">PortId</span> <span class="n">port</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">nextHop</span> <span class="o">=</span> <span class="n">ipv4_dest</span><span class="p">;</span>
+  <span class="n">headers</span><span class="p">.</span><span class="n">ip</span><span class="p">.</span><span class="n">ttl</span> <span class="o">=</span> <span class="n">headers</span><span class="p">.</span><span class="n">ip</span><span class="p">.</span><span class="n">ttl</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="n">outCtrl</span><span class="p">.</span><span class="n">outputPort</span> <span class="o">=</span> <span class="n">port</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="cm">/**
+* Computes address of next IPv4 hop and output port
+* based on the IPv4 destination of the current packet.
+* Decrements packet IPv4 TTL.
+* @param nextHop IPv4 address of next hop
+*/</span>
+<span class="n">table</span> <span class="n">ipv4_match</span> <span class="p">{</span>
+  <span class="n">key</span> <span class="o">=</span> <span class="p">{</span> <span class="n">headers</span><span class="p">.</span><span class="n">ip</span><span class="p">.</span><span class="n">dstAddr</span><span class="o">:</span> <span class="n">lpm</span><span class="p">;</span> <span class="p">}</span> <span class="c1">// longest-prefix match
+</span>  <span class="n">actions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">Drop_action</span><span class="p">;</span>
+    <span class="n">Set_nhop</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">size</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">;</span>
+  <span class="n">default_action</span> <span class="o">=</span> <span class="n">Drop_action</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**
+* Send the packet to the CPU port
+*/</span>
+<span class="n">action</span> <span class="n">Send_to_cpu</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">outCtrl</span><span class="p">.</span><span class="n">outputPort</span> <span class="o">=</span> <span class="n">CPU_OUT_PORT</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**
+* Check packet TTL and send to CPU if expired.
+*/</span>
+<span class="n">table</span> <span class="n">check_ttl</span> <span class="p">{</span>
+  <span class="n">key</span> <span class="o">=</span> <span class="p">{</span> <span class="n">headers</span><span class="p">.</span><span class="n">ip</span><span class="p">.</span><span class="n">ttl</span><span class="o">:</span> <span class="n">exact</span><span class="p">;</span> <span class="p">}</span>
+  <span class="n">actions</span> <span class="o">=</span> <span class="p">{</span> <span class="n">Send_to_cpu</span><span class="p">;</span> <span class="n">NoAction</span><span class="p">;</span> <span class="p">}</span>
+  <span class="k">const</span> <span class="n">default_action</span> <span class="o">=</span> <span class="n">NoAction</span><span class="p">;</span> <span class="c1">// defined in core.p4
+</span><span class="p">}</span>
+
+<span class="cm">/**
+* Set the destination MAC address of the packet
+* @param dmac destination MAC address.
+*/</span>
+<span class="n">action</span> <span class="n">Set_dmac</span><span class="p">(</span><span class="n">EthernetAddress</span> <span class="n">dmac</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">headers</span><span class="p">.</span><span class="n">ethernet</span><span class="p">.</span><span class="n">dstAddr</span> <span class="o">=</span> <span class="n">dmac</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**
+* Set the destination Ethernet address of the packet
+* based on the next hop IP address.
+* @param nextHop IPv4 address of next hop.
+*/</span>
+<span class="n">table</span> <span class="n">dmac</span> <span class="p">{</span>
+  <span class="n">key</span> <span class="o">=</span> <span class="p">{</span> <span class="n">nextHop</span><span class="o">:</span> <span class="n">exact</span><span class="p">;</span> <span class="p">}</span>
+  <span class="n">actions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">Drop_action</span><span class="p">;</span>
+    <span class="n">Set_dmac</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">size</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">;</span>
+  <span class="n">default_action</span> <span class="o">=</span> <span class="n">Drop_action</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**
+* Set the source MAC address.
+* @param smac: source MAC address to use
+*/</span>
+<span class="n">action</span> <span class="n">Set_smac</span><span class="p">(</span><span class="n">EthernetAddress</span> <span class="n">smac</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">headers</span><span class="p">.</span><span class="n">ethernet</span><span class="p">.</span><span class="n">srcAddr</span> <span class="o">=</span> <span class="n">smac</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**
+* Set the source mac address based on the output port.
+*/</span>
+<span class="n">table</span> <span class="n">smac</span> <span class="p">{</span>
+  <span class="n">key</span> <span class="o">=</span> <span class="p">{</span> <span class="n">outCtrl</span><span class="p">.</span><span class="n">outputPort</span><span class="o">:</span> <span class="n">exact</span><span class="p">;</span> <span class="p">}</span>
+  <span class="n">actions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">Drop_action</span><span class="p">;</span>
+    <span class="n">Set_smac</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">size</span> <span class="o">=</span> <span class="mi">16</span><span class="p">;</span>
+  <span class="n">default_action</span> <span class="o">=</span> <span class="n">Drop_action</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">apply</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">parseError</span> <span class="o">!=</span> <span class="n">error</span><span class="p">.</span><span class="n">NoError</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Drop_action</span><span class="p">();</span> <span class="c1">// invoke drop directly
+</span>    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">ipv4_match</span><span class="p">.</span><span class="n">apply</span><span class="p">();</span> <span class="c1">// Match result will go into nextHop
+</span>  <span class="k">if</span> <span class="p">(</span><span class="n">outCtrl</span><span class="p">.</span><span class="n">outputPort</span> <span class="o">==</span> <span class="n">DROP_PORT</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+  <span class="n">check_ttl</span><span class="p">.</span><span class="n">apply</span><span class="p">();</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">outCtrl</span><span class="p">.</span><span class="n">outputPort</span> <span class="o">==</span> <span class="n">CPU_OUT_PORT</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+  <span class="n">dmac</span><span class="p">.</span><span class="n">apply</span><span class="p">();</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">outCtrl</span><span class="p">.</span><span class="n">outputPort</span> <span class="o">==</span> <span class="n">DROP_PORT</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+  <span class="n">smac</span><span class="p">.</span><span class="n">apply</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// deparser section
+</span><span class="n">control</span> <span class="n">TopDeparser</span><span class="p">(</span><span class="n">inout</span> <span class="n">Parsed_packet</span> <span class="n">p</span><span class="p">,</span> <span class="n">packet_out</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">Checksum16</span><span class="p">()</span> <span class="n">ck</span><span class="p">;</span>
+  <span class="n">apply</span> <span class="p">{</span>
+    <span class="n">b</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">ethernet</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">ip</span><span class="p">.</span><span class="n">isValid</span><span class="p">())</span> <span class="p">{</span>
+      <span class="n">ck</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span> <span class="c1">// prepare checksum unit
+</span>      <span class="n">p</span><span class="p">.</span><span class="n">ip</span><span class="p">.</span><span class="n">hdrChecksum</span> <span class="o">=</span> <span class="mi">16</span><span class="n">w0</span><span class="p">;</span> <span class="c1">// clear checksum
+</span>      <span class="n">ck</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">ip</span><span class="p">);</span> <span class="c1">// compute new checksum.
+</span>      <span class="n">p</span><span class="p">.</span><span class="n">ip</span><span class="p">.</span><span class="n">hdrChecksum</span> <span class="o">=</span> <span class="n">ck</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="n">b</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">ip</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Instantiate the top-level VSS package
+</span><span class="n">VSS</span><span class="p">(</span><span class="n">TopParser</span><span class="p">(),</span> <span class="n">TopPipe</span><span class="p">(),</span> <span class="n">TopDeparser</span><span class="p">())</span> <span class="n">main</span><span class="p">;</span>
+</code></pre>
+</div>
+
+  </section>
+</article>
+
+<section class="read-more">
+   
+   
+   
+   
+   <div class="read-more-item">
+       <span class="read-more-item-dim">更早的文章</span>
+       <h2 class="post-list__post-title post-title"><a href="/2017/06/Blueprint-in-OpenDaylight/" title="link to Blueprint in Opendaylight">Blueprint in Opendaylight</a></h2>
+       <p class="excerpt">什么是BlueprintBlueprint是Apache Aries底下的一个项目。Apache Aries project consists of a set ofpluggable Java components enabling an enterprise OSGi application programmingmodels, including:  Asynchronous Services and Promises Specification  Blueprint Specifi...&hellip;</p>
+       <div class="post-list__meta"><time datetime="2017-06-30 21:40:00 +0800" class="post-list__meta--date date">2017-06-30</time> &#8226; <span class="post-list__meta--tags tags">OpenDaylight,Blueprint</span><a class="btn-border-small" href=/2017/06/Blueprint-in-OpenDaylight/>继续阅读</a></div>
+   </div>
+   
+</section>
+
+<section class="post-comments">
+  
+    <div id="disqus_thread"></div>
+    <script>
+    
+    var disqus_config = function () {
+        this.page.url = "http://localhost:4000/2017/07/Introduction-to-P4/";
+        this.page.identifier = "/2017/07/Introduction-to-P4/";
+    };
+
+    var disqus_shortname = 'ruanweizhang';
+    
+    (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>要查看<a href="http://disqus.com/?ref_noscript"> Disqus </a>评论，请启用 JavaScript</noscript>
+    
+  
+  
+  
+  
+</section>
+
+
+            <section class="footer">
+    <footer>
+    	<span class="footer__copyright">本站点采用<a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">知识共享 署名-非商业性使用-相同方式共享 4.0 国际 许可协议</a></span>
+        <span class="footer__copyright">使用 <a href="https://jekyllrb.com">Jekyll</a> 于 2017-07-07 生成</span>
+        <span class="footer__copyright">本站由 <a href="http://ruanweizhang.cn">@eric</a> 创建，采用 <a href="https://github.com/onevcat/vno-jekyll">Vno - Jekyll</a> 作为主题，您可以在 GitHub 找到<a href="https://github.com/ruanweizhang/ruanweizhang.github.io">本站源码</a> - &copy; 2017</span>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+<script type="text/javascript" src="/js/main.js"></script>
+
+
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-55434310-1', 'ruanweizhang.cn');
+    ga('send', 'pageview');
+</script>
+
+
+    
+  </body>
+
+</html>
