@@ -187,7 +187,7 @@ determine the Ethernet address of the next hop.
 >* Finally, the last table uses the outputPort to identify the source Ethernet address of the current
 switch, which is set in the outgoing packet.
 
-Match-ations结束之后，deparser会重新将packet组装起来并送到设定好的output port。源代码如下：
+Match-ations结束之后，deparser会重新将packet组装起来并送到设定好的output port。在上面的model.p4里面已经定义好了Parser，Pipe，Deparser三个module，下面源代码将会分别实现它们：
 
 ```c++
 // Include P4 core library
